@@ -1,0 +1,29 @@
+name: Build TankExporter
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Restore NuGet packages
+      run: nuget restore TankExporter.sln
+
+    - name: Build solution
+      run: msbuild TankExporter.sln /p:Configuration=Release
+
+    - name: Upload EXE
+      uses: actions/upload-artifact@v4
+      with:
+        name: TankExporter_exe
+        path: '**/bin/Release/!_Tank Exporter.exe'
