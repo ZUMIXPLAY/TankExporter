@@ -1,0 +1,40 @@
+name: Build TankExporter Installer
+
+on:
+  push:
+    tags:
+      - 'v*'  # Запуск только при создании релиз-тегов вида v1.0
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore and Build
+      run: |
+        dotnet restore
+        dotnet publish -c Release -o publish
+
+    - name: Install Inno Setup
+      run: |
+        Invoke-WebRequest -Uri "https://jrsoftware.org/download.php/is.exe" -OutFile "is.exe"
+        Start-Process -FilePath "is.exe" -ArgumentList "/VERYSILENT", "/NORESTART" -Wait
+
+    - name: Create installer
+      run: |
+        "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+
+    - name: Upload Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: Output/TankExporterSetup.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
