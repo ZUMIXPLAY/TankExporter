@@ -24,7 +24,7 @@ jobs:
       run: msbuild '!_Tank Exporter.sln' /p:Configuration=Release
 
     - name: Upload EXE
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: TankExporter_exe
         path: '**/bin/Release/!_Tank Exporter.exe'
